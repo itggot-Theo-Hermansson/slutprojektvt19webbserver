@@ -1,0 +1,42 @@
+.container{
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: 4;
+    display: grid;
+    width: 100%;
+    margin: 0 auto;
+    height: 100%;
+}
+
+h1{
+    text-align: center;
+    grid-row: span 1;
+    grid-column: span 8;
+}
+
+.produkt1{
+    grid-row: 2 / 3;
+    grid-column: 2 / 4;
+    margin: 0 auto;
+    text-align: center;
+}
+
+
+.produkt2{
+    grid-row: 2 / 3;
+    grid-column: 4 / 6;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.produkt3{
+    grid-row: 2 / 3;
+    grid-column: 6 / 8;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.login{
+    grid-row: 2 / 3;
+    grid-column: 8 / 9;
+    text-align: center;
+}

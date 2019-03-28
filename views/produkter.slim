@@ -1,0 +1,14 @@
+.container
+    h1 High End Store
+
+    .produkt1    
+        - product1.each do |e|
+            a href="/produkter/Stone-Island" = e["Kategori"] 
+    .produkt2
+        - product2.each do |e|
+            a href="/produkter/Givenchy" = e["Kategori"]
+    .produkt3
+        - product3.each do |e|
+            a href="/produkter/moncler" = e["Kategori"]
+    .login 
+        a href="/login" Login
