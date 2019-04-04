@@ -3,62 +3,36 @@ require 'slim'
 require 'sqlite3'
 require 'byebug'
 require 'bcrypt'
+require_relative 'controller'
 
 enable :sessions
 
 get('/') do
-    if session[:username] != nil
-        redirect('/logged_in')
-    end 
+    logged_in(params)
     slim(:home)
 end
 
 get('/login') do
-    if session[:user_id] != nil
-        redirect('/logged_in')
-    end
+    logged_in(params)
     slim(:login)
 end
 
-post('/login') do
+get('/admin') do
     db = SQLite3::Database.new("db/db_login.db")
     db.results_as_hash = true
+end
 
-    result = db.execute("SELECT Password, Id FROM users WHERE Username = '#{params["Username"]}'")
-    
-    if BCrypt::Password.new(result[0]["Password"]) == params["Password"]
-        session[:username] = params["Username"]
-        session[:user_id] = result[0]["Id"]
-        redirect('/profil')
-    else
-        redirect('/failed')
-    end
-
+post('/login') do
+    login(params)
 end
 
 get('/register') do
-    if session[:user_id] != nil
-        redirect('/logged_in')
-    end
+    logged_in(params)
     slim(:register)
 end
 
 post('/register') do
-    db = SQLite3::Database.new("db/db_login.db")   
-    new_password = params["Password"] 
-    hashed_password = BCrypt::Password.create(new_password)
-
-    db.execute("INSERT INTO users (Username, Password) VALUES (?, ?)", params["Username"], hashed_password)
-    redirect('/login')
-end
-
-get('/logged_in') do
-    db = SQLite3::Database.new("db/db_login.db")
-    if session[:username] == nil
-        redirect('/')
-    else
-        slim(:logged_in)
-    end
+    register(params)
 end
 
 get('/failed') do
@@ -66,11 +40,8 @@ get('/failed') do
 end
 
 get('/profil') do
-    if session[:username] == nil
-        redirect('/')
-    else
-        slim(:profil)
-    end
+    not_logged_in(params)
+    slim(:profil)
 end
 
 get('/edit_profile/:id') do
@@ -78,25 +49,11 @@ get('/edit_profile/:id') do
 end
 
 post('/edit_profile') do
-    if session[:username] == nil
-        redirect('/')
-    else
-        slim(:edit_profile)
-    end
-
-    db = SQLite3::Database.new("db/db_login.db")
-    db.execute(%Q(UPDATE users SET Username = '#{params['Rubrik']}' WHERE Id = #{session[:user_id]}))
-
-    session.destroy
-    redirect back 
+    edit_profile(params)
 end
 
 get('/produkter/moncler') do
-    db = SQLite3::Database.new("db/db_login.db")
-    db.results_as_hash = true
-
-    prod_name1 = db.execute('SELECT Produkt_Namn,Pris FROM produkter WHERE Kategori = "Moncler"')
-    slim(:moncler, locals:{product1: prod_name1})
+    moncler(params)
 end
 
 get('/beställt') do
@@ -109,35 +66,9 @@ get('/beställt') do
 end
 
 get('/produkter') do
-    db = SQLite3::Database.new("db/db_login.db")
-    db.results_as_hash = true
-
-    prod_name1 = db.execute('SELECT Kategori FROM produkter WHERE Id = "1"')
-    prod_name2 = db.execute('SELECT Kategori FROM produkter WHERE Id = "2"')
-    prod_name3= db.execute('SELECT Kategori FROM produkter WHERE Id = "3"')
-    
-    slim(:produkter, locals:{product1: prod_name1, product2: prod_name2, product3: prod_name3})
+    produkter(params)
 end
 
 post('/produkter') do
-    db = SQLite3::Database.new("db/db_login.db")
-    db.results_as_hash = true
-
-    product = db.execute('SELECT * FROM produkter WHERE Id = "1"')
-    amount = product[0]['mängd']
-    price = product[0]['pris']
-    boughtAmount = params['product1'].to_i
-    total = 0
-
-    if params['product1'] != nil
-        amount = amount - (boughtAmount)
-        db.execute('UPDATE produkter SET amount = ? WHERE Id = "1"',amount)
-        total = price * boughtAmount
-        db.execute('INSERT INTO ordrar (Id, mängd, pris, antal_kvar) VALUES ("1", ?, ?, ?)',boughtAmount,total,amount,session[:Id])
-        redirect('/produkter')
-    else
-        redirect('/produkter')
-    end
-    
-    redirect('/produkter')
+    köp(params)
 end
