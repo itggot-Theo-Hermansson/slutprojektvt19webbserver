@@ -18,8 +18,20 @@ get('/login') do
 end
 
 get('/admin') do
-    db = SQLite3::Database.new("db/db_login.db")
-    db.results_as_hash = true
+    not_logged_in(params)
+    admin(params)
+end
+
+get('/admin/help') do
+    admin_tickets(params)
+end
+
+post('/admin/help') do
+    remove_ticket(params)
+end
+
+get('/admin/beställt') do
+    beställt(params)
 end
 
 post('/login') do
@@ -56,13 +68,8 @@ get('/produkter/moncler') do
     moncler(params)
 end
 
-get('/beställt') do
-    db = SQLite3::Database.new("db/db_login.db")
-    db.results_as_hash = true
-
-    beställt = db.execute('SELECT * FROM ordrar')
-
-    slim(:beställt, locals:{history: beställt})
+post('/produkter/moncler') do
+    köp(params)
 end
 
 get('/produkter') do
@@ -71,4 +78,21 @@ end
 
 post('/produkter') do
     köp(params)
+end
+
+get('/produkter/Stone-Island') do
+    stoneisland(params)
+end
+
+get('/produkter/Givenchy') do
+    givenchy(params)
+end
+
+get('/help') do
+    not_logged_in(params)
+    slim(:kundsupport)
+end
+
+post('/help') do
+    kundsupport(params)
 end

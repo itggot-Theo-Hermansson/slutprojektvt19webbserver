@@ -40,3 +40,7 @@ h1{
     grid-column: 8 / 9;
     text-align: center;
 }
+
+.a{
+    font-family: 'Times New Roman', Times, serif;
+}

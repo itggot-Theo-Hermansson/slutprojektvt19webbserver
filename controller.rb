@@ -56,10 +56,41 @@ def edit_profile(params)
     session.destroy
 end
 
+def admin(params)
+    db = database()
+
+    user_type = db.execute('SELECT User_type FROM users WHERE Id = ?', session[:user_id]).first
+    
+    if user_type['User_type'] == "Admin" 
+        slim(:admin)
+    else
+        redirect('/produkter')
+    end
+end
+
+def admin_tickets(params)
+    db = database()
+    session[:tickets] = db.execute('SELECT Username, Ticket FROM support_tickets')
+
+    slim(:admin_help)
+end
+
+def remove_ticket(params)
+    db = database()
+    db.execute('DELETE FROM support_tickets WHERE Id = ?', session[:user_id])
+    redirect('/admin/help')
+end
+
 def moncler(params)
     db = database()
     prod_name1 = db.execute('SELECT Produkt_Namn,Pris FROM produkter WHERE Kategori = "Moncler"')
     slim(:moncler, locals:{product1: prod_name1})
+end
+
+def givenchy(params)
+    db = database()
+    prod_name1 = db.execute('SELECT Produkt_Namn,Pris FROM produkter WHERE Kategori = "Givenchy"')
+    slim(:givenchy, locals:{product1: prod_name1})
 end
 
 def produkter(params)
@@ -72,24 +103,31 @@ def produkter(params)
     slim(:produkter, locals:{product1: prod_name1, product2: prod_name2, product3: prod_name3})
 end
 
-def köp(params) 
+def beställt(params)
     db = database()
+    session[:beställt] = db.execute('SELECT * FROM ordrar')
 
-    product = db.execute('SELECT * FROM produkter WHERE Id = "1"')
-    amount = product[0]['mängd']
-    price = product[0]['pris']
-    boughtAmount = params['product1'].to_i
-    total = 0
-
-    if params['product1'] != nil
-        amount = amount - (boughtAmount)
-        db.execute('UPDATE produkter SET amount = ? WHERE Id = "1"',amount)
-        total = price * boughtAmount
-        db.execute('INSERT INTO ordrar (Id, mängd, pris, antal_kvar) VALUES ("1", ?, ?, ?)',boughtAmount,total,amount,session[:Id])
-        redirect('/produkter')
-    else
-        redirect('/produkter')
-    end
-    
-    redirect('/produkter')
+    slim(:beställt)
 end
+
+def stoneisland(params)
+    db = database()
+    prod_name1 = db.execute('SELECT Produkt_Namn,Pris FROM produkter WHERE Kategori = "Stone-Island"')
+    slim(:stoneisland, locals:{product1: prod_name1})
+end
+
+def köp(params)
+    db = database()
+    session[:produkt_Id] = 
+    Mängd = db.execute('SELECT Mängd FROM produkter WHERE Id = ?', session[:produkt_Id])
+
+    
+end
+
+def kundsupport(params)
+    db = database()
+    db.execute("INSERT INTO support_tickets (Id, Username, Ticket) VALUES (?, ?, ?)", session[:user_id], session[:username], params["Help"])
+
+    redirect('/help')
+end
+
