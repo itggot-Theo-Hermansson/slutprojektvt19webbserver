@@ -69,7 +69,7 @@ get('/produkter/moncler') do
 end
 
 post('/produkter/moncler') do
-    köp(params)
+    buy(params)
 end
 
 get('/produkter') do
@@ -77,15 +77,23 @@ get('/produkter') do
 end
 
 post('/produkter') do
-    köp(params)
+    buy(params)
 end
 
 get('/produkter/Stone-Island') do
     stoneisland(params)
 end
 
+post('/produkter/Stone-Island') do
+    buy(params)
+end
+
 get('/produkter/Givenchy') do
     givenchy(params)
+end
+
+post('/produkter/Givenchy') do
+    buy(params)
 end
 
 get('/help') do

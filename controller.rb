@@ -83,13 +83,13 @@ end
 
 def moncler(params)
     db = database()
-    prod_name1 = db.execute('SELECT Produkt_Namn,Pris FROM produkter WHERE Kategori = "Moncler"')
+    prod_name1 = db.execute('SELECT * FROM produkter WHERE Kategori = "Moncler"')
     slim(:moncler, locals:{product1: prod_name1})
 end
 
 def givenchy(params)
     db = database()
-    prod_name1 = db.execute('SELECT Produkt_Namn,Pris FROM produkter WHERE Kategori = "Givenchy"')
+    prod_name1 = db.execute('SELECT * FROM produkter WHERE Kategori = "Givenchy"')
     slim(:givenchy, locals:{product1: prod_name1})
 end
 
@@ -105,23 +105,24 @@ end
 
 def beställt(params)
     db = database()
-    session[:beställt] = db.execute('SELECT * FROM ordrar')
+    orders = db.execute('SELECT * FROM ordrar')
 
     slim(:beställt)
 end
 
 def stoneisland(params)
     db = database()
-    prod_name1 = db.execute('SELECT Produkt_Namn,Pris FROM produkter WHERE Kategori = "Stone-Island"')
+    prod_name1 = db.execute('SELECT * FROM produkter WHERE Kategori = "Stone-Island"')
     slim(:stoneisland, locals:{product1: prod_name1})
 end
 
-def köp(params)
-    db = database()
-    session[:produkt_Id] = 
-    Mängd = db.execute('SELECT Mängd FROM produkter WHERE Id = ?', session[:produkt_Id])
-
-    
+def buy(params)
+    db = database() 
+    amount = db.execute('SELECT Amount FROM produkter WHERE Id = ?', params['buy']).first
+    antal_kvar = amount[0] - 1
+    db.execute('UPDATE produkter SET Amount = ? WHERE Id = ?', antal_kvar, params['buy'])
+    db.execute('INSERT INTO ordrar (Id) VALUES (?)', params['buy'])
+    redirect back
 end
 
 def kundsupport(params)

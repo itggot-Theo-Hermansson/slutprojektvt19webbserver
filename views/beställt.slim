@@ -1,6 +1,4 @@
 .ordrar
-    - session[:beställt].reverse_each do |e|
-        h3 = e[0]
-        p = e[1]
-        p = e[2]
-        P = e[3]  
+    - orders.reverse_each do |e|
+        p = e[0]
+        p = e[1]  

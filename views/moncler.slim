@@ -4,6 +4,7 @@
         - product1.each do |e|
             h4 = e["Produkt_Namn"]
             p = e["Pris"]
-        form action="/produkter/moncler" method="POST"
-            input type="submit" value="Köp"
+            form action="/produkter/moncler" method="POST"
+                button value="#{e["Id"]}" name="buy" Köp
+                    
             
