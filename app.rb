@@ -23,6 +23,7 @@ get('/admin') do
 end
 
 get('/admin/help') do
+    not_logged_in(params)
     admin_tickets(params)
 end
 
@@ -31,7 +32,18 @@ post('/admin/help') do
 end
 
 get('/admin/beställt') do
-    beställt(params)
+    not_logged_in(params)
+    bought(params)
+end
+
+get('/purchase_complete') do
+    not_logged_in(params)
+    slim(:purchase_complete)
+end
+
+post('/purchase_complete') do
+    params(buy)
+    produkter(params)
 end
 
 post('/login') do

@@ -1,6 +1,6 @@
 .container{
     grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: 4;
+    grid-template-rows: repeat(6, 1fr);
     display: grid;
     width: 100%;
     margin: 0 auto;
@@ -35,9 +35,21 @@ h1{
     text-align: center;
 }
 
-.login{
+.profile{
     grid-row: 2 / 3;
     grid-column: 8 / 9;
+    text-align: center;
+}
+
+.login{
+    grid-row: 2 / 3;
+    grid-column: 1 / 2;
+    text-align: center;
+}
+
+.kundsupport{
+    grid-row: 5 / 6;
+    grid-column: 4 / 6;
     text-align: center;
 }
 

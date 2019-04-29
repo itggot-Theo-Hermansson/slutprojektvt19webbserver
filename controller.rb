@@ -74,14 +74,14 @@ end
 
 def admin_tickets(params)
     db = database()
-    session[:tickets] = db.execute('SELECT Username, Ticket FROM support_tickets')
+    session[:tickets] = db.execute('SELECT Id, Username, Ticket FROM support_tickets')
 
     slim(:admin_help)
 end
 
 def remove_ticket(params)
     db = database()
-    db.execute('DELETE FROM support_tickets WHERE Id = ?', session[:user_id])
+    db.execute('DELETE FROM support_tickets WHERE Id = ?', params['solve'])
     redirect('/admin/help')
 end
 
@@ -122,7 +122,7 @@ def produkter(params)
     slim(:produkter, locals:{product1: prod_name1, product2: prod_name2, product3: prod_name3})
 end
 
-def beställt(params)
+def bought(params)
     db = database()
     orders = db.execute('SELECT * FROM ordrar')
 
@@ -145,10 +145,11 @@ end
 def buy(params)
     db = database()
     amount = db.execute('SELECT Amount FROM produkter WHERE Id = ?', params['buy']).first
+    session[:product] = db.execute('SELECT Produkt_Namn FROM produkter WHERE Id = ?', params['buy']).first
     antal_kvar = amount[0] - 1
     db.execute('UPDATE produkter SET Amount = ? WHERE Id = ?', antal_kvar, params['buy'])
     db.execute('INSERT INTO ordrar (Id) VALUES (?)', params['buy'])
-    redirect back
+    redirect('/purchase_complete')
 end
 
 def kundsupport(params)
