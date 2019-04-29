@@ -56,6 +56,11 @@ get('/profil') do
     slim(:profil)
 end
 
+post('/profil') do
+    log_out(params)
+    redirect('/')
+end
+
 get('/edit_profile/:id') do
     slim(:edit_profile)
 end

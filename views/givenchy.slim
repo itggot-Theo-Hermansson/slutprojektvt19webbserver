@@ -3,7 +3,7 @@
     .produkt1    
         - product1.each do |e|
             h4 = e["Produkt_Namn"]
-            p = e["Pris"]
+            p = price
             form action="/produkter/Givenchy" method="POST"
                 button value="#{e["Id"]}" name="buy" Köp
             

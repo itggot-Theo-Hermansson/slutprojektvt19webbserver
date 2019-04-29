@@ -26,7 +26,7 @@ def login(params)
     if BCrypt::Password.new(result[0]["Password"]) == params["Password"]
         session[:username] = params["Username"]
         session[:user_id] = result[0]["Id"]
-        redirect('/profil')
+        redirect('/produkter')
     else
         redirect('/failed')
     end
@@ -68,6 +68,10 @@ def admin(params)
     end
 end
 
+def log_out(params)
+    session.destroy
+end
+
 def admin_tickets(params)
     db = database()
     session[:tickets] = db.execute('SELECT Username, Ticket FROM support_tickets')
@@ -83,14 +87,29 @@ end
 
 def moncler(params)
     db = database()
+    original_price = db.execute('SELECT Pris FROM produkter WHERE Id = 3').first
+    user_type = db.execute('SELECT User_type FROM users WHERE Id = ?', session[:user_id]).first 
     prod_name1 = db.execute('SELECT * FROM produkter WHERE Kategori = "Moncler"')
-    slim(:moncler, locals:{product1: prod_name1})
+    if user_type['User_type'] == "Business"
+        pris = original_price[0] * 0.8
+    else
+        pris = original_price[0]
+    end
+
+    slim(:moncler, locals:{product1: prod_name1, price: pris})
 end
 
 def givenchy(params)
     db = database()
+    original_price = db.execute('SELECT Pris FROM produkter WHERE Id = 2').first
+    user_type = db.execute('SELECT User_type FROM users WHERE Id = ?', session[:user_id]).first
     prod_name1 = db.execute('SELECT * FROM produkter WHERE Kategori = "Givenchy"')
-    slim(:givenchy, locals:{product1: prod_name1})
+    if user_type['User_type'] == "Business"
+        pris = original_price[0] * 0.8
+    else
+        pris = original_price[0]
+    end
+    slim(:givenchy, locals:{product1: prod_name1, price: pris})
 end
 
 def produkter(params)
@@ -112,12 +131,19 @@ end
 
 def stoneisland(params)
     db = database()
+    original_price = db.execute('SELECT Pris FROM produkter WHERE Id = 1').first
+    user_type = db.execute('SELECT User_type FROM users WHERE Id = ?', session[:user_id]).first 
     prod_name1 = db.execute('SELECT * FROM produkter WHERE Kategori = "Stone-Island"')
-    slim(:stoneisland, locals:{product1: prod_name1})
+    if user_type['User_type'] == "Business"
+        pris = original_price[0] * 0.8
+    else
+        pris = original_price[0]
+    end
+    slim(:stoneisland, locals:{product1: prod_name1, price: pris})
 end
 
 def buy(params)
-    db = database() 
+    db = database()
     amount = db.execute('SELECT Amount FROM produkter WHERE Id = ?', params['buy']).first
     antal_kvar = amount[0] - 1
     db.execute('UPDATE produkter SET Amount = ? WHERE Id = ?', antal_kvar, params['buy'])
