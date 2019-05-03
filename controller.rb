@@ -124,9 +124,9 @@ end
 
 def bought(params)
     db = database()
-    orders = db.execute('SELECT * FROM ordrar')
+    ordrar = db.execute('SELECT * FROM ordrar')
 
-    slim(:beställt)
+    slim(:beställt, locals:{orders: ordrar})
 end
 
 def stoneisland(params)

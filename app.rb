@@ -1,8 +1,8 @@
 require 'sinatra'
 require 'slim'
 require 'sqlite3'
-require 'byebug'
 require 'bcrypt'
+require 'byebug'
 require_relative 'controller'
 
 enable :sessions
