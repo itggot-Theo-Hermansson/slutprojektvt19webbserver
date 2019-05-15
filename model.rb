@@ -164,3 +164,7 @@ def kundsupport(params)
 
 end
 
+error 404 do 
+    redirect("/failed")
+end
+
