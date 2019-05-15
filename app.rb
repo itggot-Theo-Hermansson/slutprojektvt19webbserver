@@ -2,42 +2,66 @@ require 'sinatra'
 require 'slim'
 require 'sqlite3'
 require 'bcrypt'
-require 'byebug'
-require_relative 'controller'
+require_relative 'model'
 
 enable :sessions
 
+configure do
+    set :unsecured_paths, ['/', '/login', '/register']
+end
+
+before do
+    unless settings.unsecured_paths.include?(request.path)
+        if session[:user_id].nil?
+            redirect('/')
+        end
+    end
+end
+
 get('/') do
-    logged_in(params)
+    if session[:username] != nil
+        redirect('/produkter')
+    end
     slim(:home)
 end
 
 get('/login') do
-    logged_in(params)
+    if session[:username] != nil
+        redirect('/produkter')
+    end
     slim(:login)
 end
 
 get('/admin') do
-    not_logged_in(params)
+    if session[:username] == nil
+        redirect('/login')
+    end
     admin(params)
 end
 
 get('/admin/help') do
-    not_logged_in(params)
+    if session[:username] == nil
+        redirect('/login')
+    end
     admin_tickets(params)
 end
 
 post('/admin/help') do
     remove_ticket(params)
+    redirect('/admin/help')
 end
 
 get('/admin/beställt') do
-    not_logged_in(params)
+    if session[:username] == nil
+        redirect('/login')
+    end
     bought(params)
 end
 
 get('/purchase_complete') do
-    not_logged_in(params)
+    if session[:username] == nil
+        redirect('/login')
+    end
     slim(:purchase_complete)
 end
 
@@ -51,12 +75,15 @@ post('/login') do
 end
 
 get('/register') do
-    logged_in(params)
+    if session[:username] != nil
+        redirect('/produkter')
+    end
     slim(:register)
 end
 
 post('/register') do
     register(params)
+    redirect('/login')
 end
 
 get('/failed') do
@@ -64,7 +91,9 @@ get('/failed') do
 end
 
 get('/profil') do
-    not_logged_in(params)
+    if session[:username] == nil
+        redirect('/login')
+    end
     slim(:profil)
 end
 
@@ -78,6 +107,11 @@ get('/edit_profile/:id') do
 end
 
 post('/edit_profile') do
+    if session[:username] == nil
+        redirect('/')
+    else
+        slim(:edit_profile)
+    end
     edit_profile(params)
 end
 
@@ -87,6 +121,7 @@ end
 
 post('/produkter/moncler') do
     buy(params)
+    redirect('/purchase_complete')
 end
 
 get('/produkter') do
@@ -95,6 +130,7 @@ end
 
 post('/produkter') do
     buy(params)
+    redirect('/purchase_complete')
 end
 
 get('/produkter/Stone-Island') do
@@ -103,6 +139,7 @@ end
 
 post('/produkter/Stone-Island') do
     buy(params)
+    redirect('/purchase_complete')
 end
 
 get('/produkter/Givenchy') do
@@ -111,13 +148,17 @@ end
 
 post('/produkter/Givenchy') do
     buy(params)
+    redirect('/purchase_complete')
 end
 
 get('/help') do
-    not_logged_in(params)
+    if session[:username] == nil
+        redirect('/login')
+    end
     slim(:kundsupport)
 end
 
 post('/help') do
     kundsupport(params)
+    redirect('/help')
 end

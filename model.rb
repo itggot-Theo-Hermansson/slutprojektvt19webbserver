@@ -1,59 +1,68 @@
+def validate_register(params)
+    if params["Username"].nil? || params["Password"].nil?
+        return false
+    else
+        return true 
+    end
+end 
+
+def validate_edit_profile(params)
+    if params["Rubrik"].nil?
+        return false
+    else 
+        return true
+    end
+end 
+
+
+def validate_login(params)
+    if params["Username"].nil? || params["Username"].length > 10 || params["Username"].length < 2 
+        return false
+    else 
+        return true
+    end
+end 
+
 def database()
     db = SQLite3::Database.new("db/db_login.db")
     db.results_as_hash = true
     db
 end
 
-def logged_in(params)
-    db = database()
-    if session[:username] != nil
-        redirect('/produkter')
-    end
-end
-
-def not_logged_in(params)
-    db = database()
-    if session[:username] == nil
-        redirect('/login')
-    end
-end
-
 def login(params)
-    db = database()
+    if validate_login(params)
+        db = database()
 
-    result = db.execute("SELECT Password, Id FROM users WHERE Username = '#{params["Username"]}'")
+        result = db.execute("SELECT Password, Id FROM users WHERE Username = '#{params["Username"]}'")
     
-    if BCrypt::Password.new(result[0]["Password"]) == params["Password"]
-        session[:username] = params["Username"]
-        session[:user_id] = result[0]["Id"]
-        redirect('/produkter')
-    else
-        redirect('/failed')
+        if BCrypt::Password.new(result[0]["Password"]) == params["Password"]
+            session[:username] = params["Username"]
+            session[:user_id] = result[0]["Id"]
+            redirect('/produkter')
+        else
+            redirect('/failed')
+        end
     end
 end
 
 def register(params)
-    db = database()
-    new_password = params["Password"] 
-    hashed_password = BCrypt::Password.create(new_password)
+    if validate_register(params)
+        db = database()
+        new_password = params["Password"] 
+        hashed_password = BCrypt::Password.create(new_password)
 
-    db.execute("INSERT INTO users (Username, Password) VALUES (?, ?)", params["Username"], hashed_password)
-    redirect('/login')
+        db.execute("INSERT INTO users (Username, Password) VALUES (?, ?)", params["Username"], hashed_password)
+    end
 end
 
 def edit_profile(params)
-    db = database()
+    if validate_edit_profile(params)
+        db = database()
 
-    if session[:username] == nil
-        redirect('/')
-    else
-        slim(:edit_profile)
+        db.execute(%Q(UPDATE users SET Username = '#{params['Rubrik']}' WHERE Id = #{session[:user_id]}))
+
+        session.destroy
     end
-
-    db = SQLite3::Database.new("db/db_login.db")
-    db.execute(%Q(UPDATE users SET Username = '#{params['Rubrik']}' WHERE Id = #{session[:user_id]}))
-
-    session.destroy
 end
 
 def admin(params)
@@ -82,7 +91,6 @@ end
 def remove_ticket(params)
     db = database()
     db.execute('DELETE FROM support_tickets WHERE Id = ?', params['solve'])
-    redirect('/admin/help')
 end
 
 def moncler(params)
@@ -149,13 +157,11 @@ def buy(params)
     antal_kvar = amount[0] - 1
     db.execute('UPDATE produkter SET Amount = ? WHERE Id = ?', antal_kvar, params['buy'])
     db.execute('INSERT INTO ordrar (Id) VALUES (?)', params['buy'])
-    redirect('/purchase_complete')
 end
 
 def kundsupport(params)
     db = database()
     db.execute("INSERT INTO support_tickets (Id, Username, Ticket) VALUES (?, ?, ?)", session[:user_id], session[:username], params["Help"])
 
-    redirect('/help')
 end
 
