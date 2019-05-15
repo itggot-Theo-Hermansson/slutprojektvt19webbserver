@@ -1,10 +1,10 @@
 def validate_register(params)
-    if params["Username"].nil? || params["Password"].nil?
+    if params["Username"].nil? && params["Password"].nil?
         return false
     else
         return true 
     end
-end 
+end
 
 def validate_edit_profile(params)
     if params["Rubrik"].nil?
@@ -14,9 +14,8 @@ def validate_edit_profile(params)
     end
 end 
 
-
 def validate_login(params)
-    if params["Username"].nil? || params["Username"].length > 10 || params["Username"].length < 2 
+    if params["Username"].nil? && params["Username"].length > 10 && params["Username"].length < 2 && params["Password"].nil?
         return false
     else 
         return true
